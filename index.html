@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dijon Échafaudage - Carte de visite</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #0a1c46, #1d3a7c);
+      color: #fff;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      color: #333;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      padding: 30px 20px;
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .card img.logo {
+      max-width: 180px;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.8em;
+      color: #0a1c46;
+    }
+
+    h2 {
+      font-size: 1em;
+      margin-top: 5px;
+      color: #c99700;
+      font-weight: normal;
+    }
+
+    p {
+      margin: 8px 0;
+      color: #444;
+      font-size: 1em;
+    }
+
+    a.download-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 22px;
+      border-radius: 10px;o
+      background: linear-gradient(135deg, #c99700, #e1b833);
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1em;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    a.download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .qrcode {
+      margin-top: 25px;
+      animation: fadeInUp 1.2s ease-in-out;
+    }
+
+    .qrcode img {
+      width: 160px;
+      height: 160px;
+      transition: transform 0.3s;
+    }
+
+    .qrcode img:hover {
+      transform: scale(1.1);
+    }
+
+    .qrcode p {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .card {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      a.download-btn {
+        font-size: 1em;
+        padding: 12px 18px;
+      }
+
+      .qrcode img {
+        width: 140px;
+        height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="photo-contact.png" alt="Logo Dijon Échafaudage" class="logo">
+    <h1>Dijon Échafaudage</h1>
+    <h2>Montage, Vente & Location</h2>
+
+    <p>📧 dijonechafaudages@outlook.fr</p>
+    <p>📱 +33 6 98 84 80 76</p>
+    <p>📱 +33 6 52 26 29 41</p>
+
+    <a class="download-btn" href="dijon-echafaudage.vcf" download>
+      📥 Enregistrer le contact
+    </a>
+
+    <div class="qrcode">
+      <img src="qrcode-vcard.png" alt="QR Code">
+      <p>📱 Scannez pour enregistrer le contact</p>
+    </div>
+  </div>
+</body>
+</html>

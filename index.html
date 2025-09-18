@@ -256,6 +256,145 @@
         font-size: 24px;
       }
     }
+
+    /* Modal pour les options de contact */
+    .contact-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .contact-modal.show {
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+
+    .contact-modal.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-content h3 {
+      margin: 0 0 10px 0;
+      font-size: 24px;
+      color: #2c2c2c;
+    }
+
+    .modal-content p {
+      margin: 0 0 25px 0;
+      color: #666;
+      font-size: 16px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+
+    .modal-btn.primary {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .modal-btn.primary:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+
+    .modal-btn.secondary {
+      background: #2196F3;
+      color: white;
+    }
+
+    .modal-btn.secondary:hover {
+      background: #1976D2;
+      transform: translateY(-2px);
+    }
+
+    .modal-btn:not(.primary):not(.secondary):not(.close) {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    .modal-btn:not(.primary):not(.secondary):not(.close):hover {
+      background: #e0e0e0;
+      transform: translateY(-2px);
+    }
+
+    .modal-btn.close {
+      background: #f44336;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .modal-btn.close:hover {
+      background: #d32f2f;
+      transform: translateY(-2px);
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #323232;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      max-width: 90%;
+      text-align: center;
+      z-index: 1001;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .notification.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 500px) {
+      .modal-content {
+        padding: 20px;
+        margin: 20px;
+      }
+      
+      .modal-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -366,6 +505,37 @@ ADR;WORK:;;ZAE de la Boulouze;Fauvernay;;21110;France
 NOTE:Entreprise spécialisée dans le montage, la vente et la location d'échafaudages
 END:VCARD`;
 
+      // Détecter le navigateur et la plateforme
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+
+      if (isMobile) {
+        // Pour les appareils mobiles, essayer d'ouvrir directement dans l'app de contacts
+        if (isIOS) {
+          // iOS peut ouvrir les vCard via data URI
+          const dataUri = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
+          window.location.href = dataUri;
+        } else if (isAndroid) {
+          // Android : essayer l'intent ou le téléchargement
+          try {
+            const intent = `intent://add_contact#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact;S.name=Dijon Échafaudage;S.phone=+33698848076;S.email=dijonechafaudage@outlook.fr;end`;
+            window.location.href = intent;
+          } catch (e) {
+            // Fallback vers téléchargement
+            downloadVCard(vcard);
+          }
+        } else {
+          // Autres mobiles : téléchargement
+          downloadVCard(vcard);
+        }
+      } else {
+        // Pour desktop, proposer les deux options
+        showContactOptions(vcard);
+      }
+    }
+
+    function downloadVCard(vcard) {
       const blob = new Blob([vcard], { type: 'text/vcard' });
       const url = window.URL.createObjectURL(blob);
       
@@ -376,6 +546,87 @@ END:VCARD`;
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      // Notification à l'utilisateur
+      showNotification('Contact téléchargé ! Ouvrez le fichier pour l\'ajouter à vos contacts.');
+    }
+
+    function showContactOptions(vcard) {
+      const modal = document.createElement('div');
+      modal.className = 'contact-modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3>Ajouter le contact</h3>
+          <p>Choisissez comment ajouter le contact :</p>
+          <div class="modal-buttons">
+            <button onclick="openVCardDirectly('${encodeURIComponent(vcard)}')" class="modal-btn primary">
+              📱 Ouvrir dans l'app Contacts
+            </button>
+            <button onclick="downloadVCard(\`${vcard.replace(/`/g, '\\`')}\`); closeModal()" class="modal-btn secondary">
+              💾 Télécharger le fichier VCard
+            </button>
+            <button onclick="copyContactInfo(); closeModal()" class="modal-btn">
+              📋 Copier les informations
+            </button>
+            <button onclick="closeModal()" class="modal-btn close">
+              ✕ Fermer
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    function openVCardDirectly(encodedVcard) {
+      const vcard = decodeURIComponent(encodedVcard);
+      const dataUri = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
+      
+      // Essayer d'ouvrir directement
+      const link = document.createElement('a');
+      link.href = dataUri;
+      link.click();
+      
+      closeModal();
+      showNotification('Si l\'application Contacts ne s\'ouvre pas automatiquement, téléchargez le fichier VCard.');
+    }
+
+    function copyContactInfo() {
+      const contactInfo = `Dijon Échafaudage
+Montage, Vente et Location d'Échafaudages
+
+📞 +33 6 98 84 80 76
+📞 +33 6 52 26 29 41
+✉️ dijonechafaudage@outlook.fr
+📍 ZAE de la Boulouze, 21110 Fauvernay`;
+
+      navigator.clipboard.writeText(contactInfo).then(() => {
+        showNotification('Informations copiées dans le presse-papiers !');
+      }).catch(() => {
+        showNotification('Impossible de copier automatiquement. Sélectionnez et copiez manuellement.');
+      });
+    }
+
+    function closeModal() {
+      const modal = document.querySelector('.contact-modal');
+      if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+      }
+    }
+
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => notification.classList.add('show'), 10);
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
     }
 
     function showOptions() {
